@@ -31,4 +31,10 @@ public interface EmployeeMapper {
      * @return
      */
     List<Employee> select(String name);
+
+    /**
+     * 根据主键动态更新数据
+     * @param employee
+     */
+    void update(Employee employee);
 }
