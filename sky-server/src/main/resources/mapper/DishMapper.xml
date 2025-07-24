@@ -6,4 +6,30 @@
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
         insert into dish values(null, #{name}, #{categoryId}, #{price}, #{image}, #{description}, #{status}, #{createTime}, #{updateTime}, #{createUser}, #{updateUser})
     </insert>
+
+    <select id="select" resultType="com.sky.vo.DishVO">
+        select d.*, c.name category_name from dish d, category c
+        <where>
+            d.category_id = c.id
+            <if test="categoryId != null and categoryId != ''">
+                and d.category_id = #{categoryId}
+            </if>
+            <if test="name != null and name != ''">
+                and d.name like concat('%',#{name},'%')
+            </if>
+            <if test="status != null and status != ''">
+                and d.status = #{status}
+            </if>
+        </where>
+        order by d.create_time desc
+    </select>
+
+    <delete id="delete">
+        delete
+        from dish
+        where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>
