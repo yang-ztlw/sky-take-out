@@ -1,8 +1,11 @@
 package com.sky.service;
 
+import com.sky.annotation.AutoFill;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
+import com.sky.enumeration.OperationType;
 import com.sky.result.PageResult;
+import com.sky.vo.DishVO;
 
 import java.util.List;
 
@@ -26,4 +29,18 @@ public interface DishService {
      * @param ids
      */
     void delete(List<Long> ids);
+
+    /**
+     * 根据id查询菜品数据
+     * @param id
+     * @return
+     */
+    DishVO getById(Long id);
+
+    /**
+     * 根据id修改菜品数据
+     * @param dishDTO
+     */
+    @AutoFill(OperationType.UPDATE)
+    void update(DishDTO dishDTO);
 }
