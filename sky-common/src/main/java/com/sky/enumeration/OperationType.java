@@ -1,5 +1,8 @@
 package com.sky.enumeration;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 /**
  * 数据库操作类型
  */
