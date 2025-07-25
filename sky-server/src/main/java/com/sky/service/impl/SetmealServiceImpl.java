@@ -6,7 +6,6 @@ import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
-import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
@@ -16,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -28,9 +28,6 @@ public class SetmealServiceImpl implements SetmealService {
 
     @Autowired
     private SetmealDishMapper setmealDishMapper;
-
-    @Autowired
-    private DishMapper dishMapper;
     /**
      * 新增套餐
      * @param setmealDTO
@@ -116,4 +113,19 @@ public class SetmealServiceImpl implements SetmealService {
 
         return setmealVO;
     }
+
+    /**
+     * 根据id删除套餐
+     * @param ids
+     */
+    @Override
+    @Transactional
+    public void delete(List<Long> ids) {
+        //删除setmeal表中的数据
+        setmealMapper.deleteByIds(ids);
+
+        //删除setmeal_dish表中的数据
+        setmealDishMapper.deleteBySetmealIds(ids);
+    }
+
 }

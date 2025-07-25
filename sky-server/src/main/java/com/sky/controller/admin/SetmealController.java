@@ -11,6 +11,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/admin/setmeal")
 @Api("套餐相关接口")
@@ -77,5 +79,17 @@ public class SetmealController {
     public Result<SetmealVO> selectById(@PathVariable Long id){
         SetmealVO setmealVO = setmealService.selectById(id);
         return Result.success(setmealVO);
+    }
+
+    /**
+     * 根据id删除套餐
+     * @param ids
+     * @return
+     */
+    @DeleteMapping
+    @ApiOperation("根据id删除套餐")
+    public Result<String> delete(@RequestParam List<Long> ids){
+        setmealService.delete(ids);
+        return Result.success();
     }
 }
