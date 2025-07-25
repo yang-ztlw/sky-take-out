@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/dish")
 @Slf4j
-@Api("菜品相关接口")
+@Api(tags = "菜品相关接口")
 public class DishController {
 
     @Autowired
@@ -94,5 +94,17 @@ public class DishController {
     public Result<List<Dish>> selectByCategoryId(Long categoryId) {
         List<Dish> dishes = dishService.selectByCategoryId(categoryId);
         return Result.success(dishes);
+    }
+
+    /**
+     * 菜品起售、停售
+     * @param status
+     * @return
+     */
+    @ApiOperation("菜品起售、停售")
+    @PostMapping("/status/{status}")
+    public Result<String> startOrStop(@PathVariable Integer status, Long id) {
+        dishService.startOrStop(status, id);
+        return Result.success();
     }
 }
