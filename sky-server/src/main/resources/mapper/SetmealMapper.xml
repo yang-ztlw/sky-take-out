@@ -12,7 +12,7 @@
         update setmeal
         <set>
             <if test="categoryId != null">
-                categoryId = #{categoryId},
+                category_id = #{categoryId},
             </if>
             <if test="name != null">
                 name = #{name},
@@ -24,7 +24,7 @@
                 status = #{status},
             </if>
             <if test="description != null">
-                decription = #{description},
+                description = #{description},
             </if>
             <if test="image != null">
                 image = #{image},

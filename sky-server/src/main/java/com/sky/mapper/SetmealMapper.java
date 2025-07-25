@@ -40,4 +40,12 @@ public interface SetmealMapper {
      */
     @AutoFill(OperationType.INSERT)
     void update(Setmeal setmeal);
+
+    /**
+     * 根据id查询套餐数据
+     * @param id
+     * @return
+     */
+    @Select("select * from setmeal where id = #{id}")
+    Setmeal selectById(Long id);
 }
