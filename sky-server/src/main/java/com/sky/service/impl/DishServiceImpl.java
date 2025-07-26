@@ -169,7 +169,7 @@ public class DishServiceImpl implements DishService {
      */
     @Override
     public List<DishVO> list(Long categoryId) {
-        List<Dish> dishList = dishMapper.selectByCategoryId(categoryId);
+        List<Dish> dishList = dishMapper.selectByCategoryIdAndStatusEnable(categoryId, StatusConstant.ENABLE);
         ArrayList<DishVO> list = new ArrayList<>();
         dishList.forEach(dish -> {
             DishVO dishVO = new DishVO();

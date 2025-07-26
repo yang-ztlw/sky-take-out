@@ -64,4 +64,12 @@ public interface DishMapper {
      */
     @Select("select * from dish where category_id = #{categoryId}")
     List<Dish> selectByCategoryId(Long categoryId);
+
+    /**
+     * 根据分类id查询菜品在用户端，要求是起售状态
+     * @param categoryId
+     * @return
+     */
+    @Select("select * from dish where category_id = #{categoryId} and status = #{status}")
+    List<Dish> selectByCategoryIdAndStatusEnable(Long categoryId, Integer status);
 }

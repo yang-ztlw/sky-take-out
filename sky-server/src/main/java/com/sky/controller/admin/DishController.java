@@ -11,9 +11,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/admin/dish")
@@ -24,6 +26,9 @@ public class DishController {
     @Autowired
     private DishService dishService;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     /**
      * 新增菜品
      * @param dishDTO
@@ -33,6 +38,10 @@ public class DishController {
     @PostMapping
     public Result<String> save(@RequestBody DishDTO dishDTO) {
         dishService.save(dishDTO);
+
+        //清理redis缓存数据
+        cleanCache("dish_" + dishDTO.getCategoryId());
+
         return Result.success();
     }
 
@@ -57,6 +66,10 @@ public class DishController {
     @ApiOperation("删除菜品")
     public Result<String> delete(@RequestParam List<Long> ids) {
         dishService.delete(ids);
+
+        //清理redis缓存数据
+        cleanCache("dish_*");
+
         return Result.success();
     }
 
@@ -81,6 +94,10 @@ public class DishController {
     @PutMapping
     public Result<String> update(@RequestBody DishDTO dishDTO) {
         dishService.update(dishDTO);
+
+        //清理redis缓存数据
+        cleanCache("dish_*");
+
         return Result.success();
     }
 
@@ -105,6 +122,19 @@ public class DishController {
     @PostMapping("/status/{status}")
     public Result<String> startOrStop(@PathVariable Integer status, Long id) {
         dishService.startOrStop(status, id);
+
+        //清理redis缓存数据
+        cleanCache("dish_*");
+
         return Result.success();
+    }
+
+    /**
+     * 清理缓存数据
+     * @param pattern
+     */
+    private void cleanCache(String pattern) {
+        Set keys = redisTemplate.keys(pattern);
+        redisTemplate.delete(keys);
     }
 }
