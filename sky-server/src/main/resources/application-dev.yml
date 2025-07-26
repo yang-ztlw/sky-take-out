@@ -9,11 +9,15 @@ sky:
 
   alioss:
     endpoint: oss-cn-beijing.aliyuncs.com
-#    access-key-id: LTAI5tL8mN6S4zq1xM9dUe9Q
-#    access-key-secret: KnNPaJtAdkRJ8NJ2gdzpwfmgqgpYOq
+    access-key-id: LTAI5tL8mN6S4zq1xM9dUe9Q
+    access-key-secret: KnNPaJtAdkRJ8NJ2gdzpwfmgqgpYOq
     bucket-name: yang-springboot-web
 
   redis:
     host: localhost
     port: 6379
     database: 1
+
+  wechat:
+    appid: wx102e7c208839ea85
+    secret: d66df2818f478906fc4960e103aa8c9f
