@@ -9,4 +9,69 @@
                                    #{amount},#{remark},#{phone},#{address},#{userName},#{consignee},#{cancelReason},#{rejectionReason},
                                    #{cancelTime},#{estimatedDeliveryTime},#{deliveryStatus},#{deliveryTime},#{packAmount},#{tablewareNumber},#{tablewareStatus})
     </insert>
+
+    <update id="pageQuery">
+        select *
+        from orders
+        <where>
+            <if test="status != null">
+                status = #{status}
+            </if>
+        </where>
+    </update>
+
+    <update id="cancel">
+        update orders
+        <set>
+            <if test="status != null">
+                status = #{status}
+            </if>
+            <if test="cancelReason != null">
+                and cancel_reason = #{cancelReason}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="conditionSearch" resultType="com.sky.entity.Orders">
+        select *
+        from orders
+        <where>
+            <if test="number != null">
+                number = #{number}
+            </if>
+            <if test="phone != null">
+                and phone = #{phone}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="beginTime != null">
+                and begin_time = #{beginTime}
+            </if>
+            <if test="endTime != null">
+                and end_time = #{endTime}
+            </if>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+        </where>
+    </select>
+
+    <select id="countOrder" resultType="java.lang.Integer">
+        select count(*)
+        from orders
+        <where>
+            <if test="status != null">
+                status = #{status}
+            </if>
+            <if test="beginTime != null">
+                and order_time &gt; #{beginTime}
+            </if>
+            <if test="endTime != null">
+                and order_time &lt; #{endTime}
+            </if>
+        </where>
+    </select>
+
 </mapper>

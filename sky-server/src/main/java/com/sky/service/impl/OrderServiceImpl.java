@@ -1,8 +1,11 @@
 package com.sky.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
-import com.sky.dto.OrdersSubmitDTO;
+import com.sky.dto.*;
 import com.sky.entity.AddressBook;
 import com.sky.entity.OrderDetail;
 import com.sky.entity.Orders;
@@ -13,8 +16,12 @@ import com.sky.mapper.AddressBookMapper;
 import com.sky.mapper.OrderDetailMapper;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.ShoppingCartMapper;
+import com.sky.result.PageResult;
 import com.sky.service.OrderService;
+import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
+import com.sky.vo.OrderVO;
+import com.sky.vo.OrdersPageQueryVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -89,5 +96,180 @@ public class OrderServiceImpl implements OrderService {
                 .orderAmount(orders.getAmount())
                 .orderTime(orders.getOrderTime())
                 .build();
+    }
+
+    /**
+     * 订单支付
+     * @param ordersPaymentDTO
+     */
+    @Override
+    public void pay(OrdersPaymentDTO ordersPaymentDTO) {
+        Orders orders = new Orders();
+        orders.setNumber(ordersPaymentDTO.getOrderNumber());
+        orders.setStatus(Orders.TO_BE_CONFIRMED);
+        orders.setPayMethod(ordersPaymentDTO.getPayMethod());
+        orders.setPayStatus(Orders.PAID);
+        orderMapper.update(orders);
+    }
+
+    /**
+     * 再来一单
+     * @param id
+     */
+    @Override
+    public void repetition(Long id) {
+
+    }
+
+    /**
+     * 历史订单查询
+     * @param page
+     * @param pageSize
+     * @param status
+     * @return
+     */
+    @Override
+    public PageResult pageQuery(Integer page, Integer pageSize, Integer status) {
+        PageHelper.startPage(page, pageSize);
+        List<Orders> list = orderMapper.pageQuery(status);
+        Page<Orders> pageList = (Page<Orders>) list;
+        ArrayList<OrderVO> orderVOS = new ArrayList<>();
+        PageResult pageResult = new PageResult();
+        pageResult.setTotal(pageList.getTotal());
+
+        list.forEach(order -> {
+            OrderVO orderVO = new OrderVO();
+            List<OrderDetail> orderDetailList = orderDetailMapper.selectByOrderId(order.getId());
+            orderVO.setOrderDishes(order.toString());
+            orderVO.setOrderDetailList(orderDetailList);
+            orderVOS.add(orderVO);
+        });
+
+        pageResult.setRecords(orderVOS);
+
+        return pageResult;
+    }
+
+    /**
+     * 取消订单
+     * @param id
+     */
+    @Override
+    public void cancel(Long id) {
+        Orders orders = new Orders();
+        orders.setId(id);
+        orders.setStatus(Orders.CANCELLED);
+        orderMapper.cancel(orders);
+    }
+
+    /**
+     * 查询订单详情
+     * @param id
+     * @return
+     */
+    @Override
+    public OrderVO getOrderById(Long id) {
+        Orders orders = orderMapper.selectById(id);
+        List<OrderDetail> orderDetailList = orderDetailMapper.selectByOrderId(orders.getId());
+        OrderVO orderVO = new OrderVO();
+        orderVO.setOrderDishes(JSON.toJSONString(orders));
+        orderVO.setOrderDetailList(orderDetailList);
+        return orderVO;
+    }
+
+    /**
+     * 取消订单
+     * @param ordersCancelDTO
+     */
+    @Override
+    public void adminCancel(OrdersCancelDTO ordersCancelDTO) {
+        Orders orders = new Orders();
+        orders.setId(ordersCancelDTO.getId());
+        orders.setStatus(Orders.CANCELLED);
+        orders.setCancelReason(ordersCancelDTO.getCancelReason());
+        orderMapper.cancel(orders);
+    }
+
+    /**
+     * 各个状态的订单数量统计
+     * @return
+     */
+    @Override
+    public OrderStatisticsVO statistics() {
+        OrderStatisticsVO orderStatisticsVO = new OrderStatisticsVO();
+        orderStatisticsVO.setToBeConfirmed(orderMapper.countByStatus(Orders.TO_BE_CONFIRMED));
+        orderStatisticsVO.setConfirmed(orderMapper.countByStatus(Orders.CONFIRMED));
+        orderStatisticsVO.setDeliveryInProgress(orderMapper.countByStatus(Orders.DELIVERY_IN_PROGRESS));
+        return orderStatisticsVO;
+    }
+
+    /**
+     * 完成订单
+     * @param id
+     */
+    @Override
+    public void complete(Long id) {
+        Orders orders = new Orders();
+        orders.setId(id);
+        orders.setStatus(Orders.COMPLETED);
+        orderMapper.complete(orders);
+    }
+
+    /**
+     * 拒单
+     * @param ordersRejectionDTO
+     */
+    @Override
+    public void rejection(OrdersRejectionDTO ordersRejectionDTO) {
+        Orders orders = new Orders();
+        BeanUtils.copyProperties(ordersRejectionDTO, orders);
+        orders.setStatus(Orders.CANCELLED);
+        orderMapper.rejection(orders);
+    }
+
+    /**
+     * 接单
+     * @param ordersConfirmDTO
+     */
+    @Override
+    public void confirm(OrdersConfirmDTO ordersConfirmDTO) {
+        Orders orders = new Orders();
+        orders.setId(ordersConfirmDTO.getId());
+        orders.setStatus(Orders.CONFIRMED);
+        orderMapper.updateStatus(orders);
+    }
+
+    /**
+     * 派送订单
+     * @param id
+     */
+    @Override
+    public void delivery(Long id) {
+        Orders orders = new Orders();
+        orders.setId(id);
+        orders.setStatus(Orders.DELIVERY_IN_PROGRESS);
+        orderMapper.updateStatus(orders);
+    }
+
+    @Override
+    public PageResult conditionSearch(OrdersPageQueryDTO ordersPageQueryDTO) {
+        PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize());
+        List<Orders> list = orderMapper.conditionSearch(ordersPageQueryDTO);
+        Page<Orders> pageList = (Page<Orders>) list;
+        PageResult pageResult = new PageResult();
+        pageResult.setTotal(pageList.getTotal());
+        ArrayList<OrdersPageQueryVO> ordersPageQueryVOS = new ArrayList<>();
+
+        list.forEach(order -> {
+            OrdersPageQueryVO ordersPageQueryVO = new OrdersPageQueryVO();
+            List<OrderDetail> orderDetailList = orderDetailMapper.selectByOrderId(order.getId());
+            ordersPageQueryVO.setOrderDishes(JSON.toJSONString(orderDetailList));
+            ordersPageQueryVO.setOrders(order);
+            ordersPageQueryVOS.add(ordersPageQueryVO);
+        });
+
+        pageResult.setRecords(ordersPageQueryVOS);
+
+        return pageResult;
     }
 }
