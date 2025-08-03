@@ -51,7 +51,6 @@ public interface OrderMapper {
      * 查询此状态下的订单数量
      * @param status
      */
-    @Select("select count(*) from orders where status = #{status}")
     Integer countByStatus(Integer status);
 
     /**

@@ -18,10 +18,7 @@ import com.sky.mapper.OrderMapper;
 import com.sky.mapper.ShoppingCartMapper;
 import com.sky.result.PageResult;
 import com.sky.service.OrderService;
-import com.sky.vo.OrderStatisticsVO;
-import com.sky.vo.OrderSubmitVO;
-import com.sky.vo.OrderVO;
-import com.sky.vo.OrdersPageQueryVO;
+import com.sky.vo.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -258,17 +255,17 @@ public class OrderServiceImpl implements OrderService {
         Page<Orders> pageList = (Page<Orders>) list;
         PageResult pageResult = new PageResult();
         pageResult.setTotal(pageList.getTotal());
-        ArrayList<OrdersPageQueryVO> ordersPageQueryVOS = new ArrayList<>();
+        ArrayList<OrderPageVO> orderPageVOS = new ArrayList<>();
 
         list.forEach(order -> {
-            OrdersPageQueryVO ordersPageQueryVO = new OrdersPageQueryVO();
+            OrderPageVO orderPageVO = new OrderPageVO();
             List<OrderDetail> orderDetailList = orderDetailMapper.selectByOrderId(order.getId());
-            ordersPageQueryVO.setOrderDishes(JSON.toJSONString(orderDetailList));
-            ordersPageQueryVO.setOrders(order);
-            ordersPageQueryVOS.add(ordersPageQueryVO);
+            BeanUtils.copyProperties(order, orderPageVO);
+            orderPageVO.setOrderDishes(orderDetailList.toString());
+            orderPageVOS.add(orderPageVO);
         });
 
-        pageResult.setRecords(ordersPageQueryVOS);
+        pageResult.setRecords(orderPageVOS);
 
         return pageResult;
     }

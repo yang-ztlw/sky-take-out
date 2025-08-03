@@ -1,6 +1,5 @@
 package com.sky.controller.admin;
 
-import com.sky.context.BaseContext;
 import com.sky.dto.OrdersCancelDTO;
 import com.sky.dto.OrdersConfirmDTO;
 import com.sky.dto.OrdersPageQueryDTO;
@@ -134,7 +133,6 @@ public class OrderController {
                 .number(number)
                 .phone(phone)
                 .status(status)
-                .userId(BaseContext.getCurrentId())
                 .build();
         PageResult pageResult = orderService.conditionSearch(ordersPageQueryDTO);
         return pageResult;

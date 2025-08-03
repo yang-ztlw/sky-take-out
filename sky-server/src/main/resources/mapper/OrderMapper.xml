@@ -52,9 +52,6 @@
             <if test="endTime != null">
                 and end_time = #{endTime}
             </if>
-            <if test="userId != null">
-                and user_id = #{userId}
-            </if>
         </where>
     </select>
 
@@ -70,6 +67,16 @@
             </if>
             <if test="endTime != null">
                 and order_time &lt; #{endTime}
+            </if>
+        </where>
+    </select>
+
+    <select id="countByStatus" resultType="java.lang.Integer">
+        select count(*)
+        from orders
+        <where>
+            <if test="status != null">
+                status = #{status}
             </if>
         </where>
     </select>
